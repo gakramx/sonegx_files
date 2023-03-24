@@ -1,0 +1,5 @@
+[D-BUS Service]
+Name=org.gna.home.a2jmidid
+#Exec=/usr/bin/a2jmidid dbus
+
+SystemdService=dbus-org.gna.home.a2jmidid.service

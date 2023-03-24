@@ -1,0 +1,5 @@
+[D-BUS Service]
+Name=org.jackaudio.service
+#Exec=/usr/bin/jackdbus auto
+
+SystemdService=dbus-org.jackaudio.service

@@ -1,0 +1,69 @@
+[Unit]
+Description=JACK 2
+After=pulseaudio.service
+Requires=dbus.socket
+Requires=pulseaudio.service
+
+[Service]
+Type=dbus
+BusName=org.jackaudio.service
+
+ExecStartPre=-/usr/bin/killall -9 jackdbus
+ExecStartPre=-/bin/sleep 2
+#ExecStartPre=-/usr/bin/pacmd load-module module-null-sink
+#ExecStartPre=-/bin/sleep 2
+#ExecStartPre=-/usr/bin/pacmd set-default-sink null
+
+#ExecStartPre=-/usr/bin/pacmd unload-module module-jackdbus-detect
+#ExecStartPre=-/bin/sleep 1
+#ExecStartPre=-/usr/bin/pacmd unload-module module-jack-sink
+#ExecStartPre=-/usr/bin/pacmd unload-module module-jack-source
+#ExecStartPre=-/bin/sleep 2
+
+#ExecStartPre=-/usr/bin/pacmd suspend 1
+ExecStartPre=-/bin/sleep 1
+
+ExecStart=/usr/bin/jackdbus auto
+
+ExecStartPost=-/bin/sleep 6
+ExecStartPost=/usr/bin/jack_control ds alsa
+ExecStartPost=/usr/bin/jack_control dps device hw:MicU,0
+ExecStartPost=/usr/bin/jack_control dps period 256
+ExecStartPost=/usr/bin/jack_control dps nperiods 3
+ExecStartPost=/usr/bin/jack_control dps rate 48000
+#ExecStartPost=/usr/bin/jack_control dps input-latency 32
+#ExecStartPost=/usr/bin/jack_control dps output-latency 32
+#ExecStartPost=/usr/bin/jack_control dps midi-driver none
+ExecStartPost=/usr/bin/jack_control eps driver alsa
+ExecStartPost=/usr/bin/jack_control eps realtime True
+ExecStartPost=/usr/bin/jack_control eps realtime-priority 15
+ExecStartPost=-/bin/sleep 1
+
+ExecStartPost=-/usr/bin/jack_control start
+ExecStartPost=-/bin/sleep 3
+
+#ExecStartPost=-/usr/bin/pacmd load-module module-jackdbus-detect channels=2 connect=true
+#ExecStartPost=-/bin/sleep 3
+#ExecStartPost=-/usr/bin/pacmd set-default-sink jack_out
+#ExecStartPost=-/usr/bin/pacmd suspend-sink jack_out 0
+
+ExecStop=-/usr/bin/jack_control exit
+ExecStopPost=-/bin/sleep 2
+ExecStopPost=-/usr/bin/killall -9 jackdbus
+ExecStopPost=-/bin/sleep 1
+
+#ExecStopPost=-/usr/bin/pacmd unload-module module-jackdbus-detect
+#ExecStopPost=-/bin/sleep 1
+#ExecStopPost=-/usr/bin/pacmd unload-module module-jack-sink
+#ExecStopPost=-/usr/bin/pacmd unload-module module-jack-source
+#ExecStopPost=-/bin/sleep 1
+#ExecStopPost=-/usr/bin/pacmd set-default-sink alsa_output.pci-0000_01_00.1.hdmi-stereo-extra1
+#ExecStopPost=-/bin/sleep 2
+#ExecStopPost=-/usr/bin/pacmd suspend 0
+
+SuccessExitStatus=0
+RemainAfterExit=yes
+
+
+[Install]
+WantedBy=default.target
